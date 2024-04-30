@@ -9,8 +9,8 @@ const users = [
 
 // Dummy user history data
 const userHistory = [
-    { name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-04-28' },
-    { name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-04-28' },
+    { name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-04-30' },
+    { name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-04-30' },
     { name: '20:00 – Eating some chips (admin)', height: 10, day: '2024-04-30' }
 ];
 
