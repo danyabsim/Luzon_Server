@@ -1,15 +1,15 @@
-import { createServer } from 'http';
+import {createServer} from 'http';
 import cors from 'cors';
 
 const users = [
-    { name: 'admin', pass: 'admin', isAdmin: true },
-    { name: 'temp', pass: 'temp', isAdmin: false }
+    {username: 'admin', password: 'admin', isAdmin: true},
+    {username: 'temp', password: 'temp', isAdmin: false}
 ];
 
 const userHistory = [
-    { name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-04-30' },
-    { name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-04-30' },
-    { name: '20:00 – Eating some chips (admin)', height: 10, day: '2024-04-30' }
+    {name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-05-01'},
+    {name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-05-01'},
+    {name: '20:00 – Eating some chips (admin)', height: 10, day: '2024-05-01'}
 ];
 
 const corsOptions = {
@@ -26,10 +26,27 @@ const server = createServer((req, res) => {
             });
             req.on('end', () => {
                 const requestData = JSON.parse(body);
-                if (req.url === '/connect') handleConnectRequest(requestData, res);
-                else if (req.url === '/addEvent') handleAddHistoryRequest(requestData, res);
-                else if (req.url === '/removeEvent') handleRemoveHistoryRequest(requestData, res);
-                else notFoundResponse(res);
+                const {username, password} = requestData;
+                const user = users.find(u => u.username === username && u.password === password);
+                if (req.url === '/connect') {
+                } else if (req.url === '/addEvent') {
+                    const {name, height, day} = requestData;
+                    userHistory.push({name: name, height: height, day: day});
+                } else if (req.url === '/removeEvent') {
+                    const indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.day === requestData.day);
+                    if (indexToRemove !== -1) userHistory.splice(indexToRemove, 1);
+                } else{
+                    notFoundResponse(res);
+                }
+                if (user) {
+                    if (user.isAdmin) sendResponse(res, 200, userHistory);
+                    else {
+                        const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
+                        sendResponse(res, 200, userSpecificHistory);
+                    }
+                } else {
+                    sendResponse(res, 404, 'User not found');
+                }
             });
         } else notFoundResponse(res);
     });
@@ -40,31 +57,8 @@ server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
 
-function handleConnectRequest(requestData, res) {
-    const { name, pass } = requestData;
-    const user = users.find(u => u.name === name && u.pass === pass);
-    if (user) {
-        if (user.isAdmin) sendResponse(res, 200, userHistory);
-        else {
-            const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.name})`));
-            sendResponse(res, 200, userSpecificHistory);
-        }
-    } else sendResponse(res, 404, 'User not found');
-}
-
-function handleAddHistoryRequest(requestData, res) {
-    userHistory.push(requestData);
-    sendResponse(res, 200, userHistory);
-}
-
-function handleRemoveHistoryRequest(requestData, res) {
-    const indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.day === requestData.day);
-    if (indexToRemove !== -1) userHistory.splice(indexToRemove, 1);
-    sendResponse(res, 200, userHistory);
-}
-
 function sendResponse(res, statusCode, data) {
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.writeHead(statusCode, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(data));
 }
 
