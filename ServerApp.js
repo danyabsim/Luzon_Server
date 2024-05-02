@@ -7,9 +7,9 @@ const users = [
 ];
 
 const userHistory = [
-    {name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-05-01'},
-    {name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-05-01'},
-    {name: '20:00 – Eating some chips (admin)', height: 10, day: '2024-05-01'}
+    {name: '17:00 – Cooking some meal (temp)', height: 10, day: '2024-05-02'},
+    {name: '10:00 – Going to the gym (temp)', height: 10, day: '2024-05-02'},
+    {name: '20:00 – Eating some chips (admin)', height: 10, day: '2024-05-02'}
 ];
 
 const corsOptions = {
