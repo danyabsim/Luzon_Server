@@ -33,8 +33,11 @@ const server = createServer((req, res) => {
                     const {name, height, day} = requestData;
                     userHistory.push({name: name, height: height, day: day});
                 } else if (req.url === '/removeEvent') {
-                    const indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.day === requestData.day);
-                    if (indexToRemove !== -1) userHistory.splice(indexToRemove, 1);
+                    let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                    while (indexToRemove !== -1) {
+                        userHistory.splice(indexToRemove, 1)
+                        indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                    }
                 } else{
                     notFoundResponse(res);
                 }
