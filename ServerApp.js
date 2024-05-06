@@ -7,9 +7,9 @@ const users = [
 ];
 
 const userHistory = [
-    {name: '10:00 – Going to the gym (temp)', height: 12463452, day: '2024-05-05'},
-    {name: '17:00 – Cooking some meal (temp)', height: 0, day: '2024-05-05'},
-    {name: '20:00 – Eating some chips (admin)', height: 255 * 255 * 255, day: '2024-05-05'}
+    {name: '10:00 – Going to the gym (temp)', height: 12463452, day: '2024-05-07'},
+    {name: '17:00 – Cooking some meal (temp)', height: 0, day: '2024-05-07'},
+    {name: '20:00 – Eating some chips (admin)', height: 255 * 255 * 255, day: '2024-05-07'}
 ];
 
 const corsOptions = {
@@ -38,14 +38,14 @@ const server = createServer((req, res) => {
                         userHistory.splice(indexToRemove, 1)
                         indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
                     }
-                } else{
+                } else {
                     notFoundResponse(res);
                 }
                 if (user) {
-                    if (user.isAdmin) sendResponse(res, 200, userHistory);
+                    if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userHistory});
                     else {
                         const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
-                        sendResponse(res, 200, userSpecificHistory);
+                        sendResponse(res, 200, {isAdmin: user.isAdmin, userSpecificHistory});
                     }
                 } else {
                     sendResponse(res, 404, 'User not found');
