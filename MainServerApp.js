@@ -19,7 +19,7 @@ const server = createServer((req, res) => {
                     case '/removeEvent':
                         eventFunctions(requestData, res, req);
                         break;
-                    case '/getAllUsersNames':
+                    case '/getAllUserNames':
                         sendResponse(res, 200, users.map(user => user.username));
                         break;
                     case '/addUser':
