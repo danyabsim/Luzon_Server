@@ -18,7 +18,7 @@ export function eventFunctions(requestData, res, req) {
         if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userHistory});
         else {
             const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
-            sendResponse(res, 200, {isAdmin: user.isAdmin, userSpecificHistory});
+            sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userSpecificHistory});
         }
     } else {
         sendResponse(res, 404, 'User not found');
