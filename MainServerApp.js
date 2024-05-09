@@ -1,8 +1,9 @@
 import {createServer} from 'http';
 import cors from 'cors';
-import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
+import {notFoundResponse} from "./Functions/ServerFunctions.js";
 import {corsOptions, users} from "./Data/Data.js";
 import {eventFunctions} from "./Functions/EventFunctions.js";
+import {userFunctions} from "./Functions/UserFunctions.js";
 
 const server = createServer((req, res) => {
     cors(corsOptions)(req, res, () => {
@@ -20,13 +21,9 @@ const server = createServer((req, res) => {
                         eventFunctions(requestData, res, req);
                         break;
                     case '/getAllUserNames':
-                        sendResponse(res, 200, users.map(user => user.username));
-                        break;
                     case '/addUser':
-                        users = users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
-                        break;
                     case '/removeUser':
-                        users = users.filter(entry => entry.username !== requestData.username);
+                        userFunctions(requestData, res, req);
                         break;
                     case '/changePassword':
                         const {username, password, newPassword} = requestData;
