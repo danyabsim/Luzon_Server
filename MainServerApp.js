@@ -1,9 +1,7 @@
 import {createServer} from 'http';
 import cors from 'cors';
-import {notFoundResponse} from "./Functions/ServerFunctions.js";
-import {corsOptions, users} from "./Data/Data.js";
-import {eventFunctions} from "./Functions/EventFunctions.js";
-import {userFunctions} from "./Functions/UserFunctions.js";
+import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
+import {corsOptions, userHistory, users} from "./Data/Data.js";
 
 const server = createServer((req, res) => {
     cors(corsOptions)(req, res, () => {
@@ -16,19 +14,40 @@ const server = createServer((req, res) => {
                 const requestData = JSON.parse(body);
                 switch (req.url) {
                     case '/connect':
+                        const user = users.find(u => u.username === requestData.username && u.password === requestData.password);
+                        if (user) {
+                            if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userHistory});
+                            else {
+                                const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
+                                sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userSpecificHistory});
+                            }
+                        } else {
+                            sendResponse(res, 404, 'User not found');
+                        }
+                        break;
                     case '/addEvent':
+                        const {name, height, day} = requestData;
+                        userHistory.push({name: name, height: height, day: day});
+                        break;
                     case '/removeEvent':
-                        eventFunctions(requestData, res, req);
+                        let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                        while (indexToRemove !== -1) {
+                            userHistory.splice(indexToRemove, 1)
+                            indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                        }
                         break;
                     case '/getAllUserNames':
+                        sendResponse(res, 200, users.map(user => user.username));
+                        break;
                     case '/addUser':
+                        users = users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
+                        break;
                     case '/removeUser':
-                        userFunctions(requestData, res, req);
+                        users = users.filter(entry => entry.username !== requestData.username);
                         break;
                     case '/changePassword':
-                        const {username, password, newPassword} = requestData;
-                        const userIndex = users.findIndex(user => user.username === username && user.password === password);
-                        if (userIndex !== -1) users[userIndex].password = newPassword;
+                        const userIndex = users.findIndex(user => user.username === requestData.username && user.password === requestData.password);
+                        if (userIndex !== -1) users[userIndex].password = requestData.newPassword;
                         break;
                     default:
                         notFoundResponse(res);
