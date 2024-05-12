@@ -4,9 +4,9 @@ export let users = [
 ];
 
 export let userHistory = [
-    {name: '10:00 – Going to the gym (temp)', height: 12463452, day: '2024-05-07'},
-    {name: '17:00 – Cooking some meal (temp)', height: 0, day: '2024-05-07'},
-    {name: '20:00 – Eating some chips (admin)', height: 255 * 255 * 255, day: '2024-05-07'}
+    {name: '10:00 – Going to the gym (temp)', height: 12463452, day: '2024-05-13'},
+    {name: '17:00 – Cooking some meal (temp)', height: 0, day: '2024-05-13'},
+    {name: '20:00 – Eating some chips (admin)', height: 255 * 255 * 255, day: '2024-05-13'}
 ];
 
 export const corsOptions = {
