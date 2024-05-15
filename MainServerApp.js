@@ -1,7 +1,17 @@
 import {createServer} from 'http';
 import cors from 'cors';
 import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
-import {corsOptions, userHistory, users} from "./Data/Data.js";
+
+let users = [
+    {username: 'admin', password: 'admin', isAdmin: true},
+];
+
+let userHistory = [];
+
+const corsOptions = {
+    origin: '*',
+    methods: 'GET, POST, PUT, DELETE'
+};
 
 const server = createServer((req, res) => {
     cors(corsOptions)(req, res, () => {
@@ -40,7 +50,7 @@ const server = createServer((req, res) => {
                         sendResponse(res, 200, users.map(user => user.username));
                         break;
                     case '/addUser':
-                        users = users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
+                        users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
                         break;
                     case '/removeUser':
                         users = users.filter(entry => entry.username !== requestData.username);
