@@ -36,14 +36,13 @@ const server = createServer((req, res) => {
                         }
                         break;
                     case '/addEvent':
-                        const {name, height, day} = requestData;
-                        userHistory.push({name: name, height: height, day: day});
+                        userHistory.push({name: requestData.name, height: requestData.height, day: requestData.day});
                         break;
                     case '/removeEvent':
-                        let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                        let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
                         while (indexToRemove !== -1) {
-                            userHistory.splice(indexToRemove, 1)
-                            indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name);
+                            userHistory.splice(indexToRemove, 1);
+                            indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
                         }
                         break;
                     case '/getAllUserNames':
