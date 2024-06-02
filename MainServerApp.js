@@ -49,7 +49,7 @@ const server = createServer((req, res) => {
                         sendResponse(res, 200, users.map(user => user.username));
                         break;
                     case '/addUser':
-                        users.push({username: requestData.username, password: requestData.password, image: null, isAdmin: requestData.isAdmin});
+                        if (users.findIndex(entry => entry.username === requestData.username) === -1) users.push({username: requestData.username, password: requestData.password, image: null, isAdmin: requestData.isAdmin});
                         break;
                     case '/removeUser':
                         users = users.filter(entry => entry.username !== requestData.username);
