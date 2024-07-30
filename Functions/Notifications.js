@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-export const sendNotification = async (token: string) => {
+export async function sendNotification (token) {
     if (token === '') return;
     const message = {
         to: token,
@@ -19,4 +19,4 @@ export const sendNotification = async (token: string) => {
         },
         body: JSON.stringify(message),
     });
-};
+}
