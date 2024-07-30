@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 
 export const sendNotification = async (token: string) => {
+    if (token === '') return;
     const message = {
         to: token,
         sound: 'default',
