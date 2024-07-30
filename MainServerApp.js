@@ -1,9 +1,12 @@
 import {createServer} from 'http';
 import cors from 'cors';
 import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
+const {extractAndConvertDate} = require('./Functions/Date.js');
+const {sendNotification} = require('./Functions/Norifications.js');
+const schedule = require('node-schedule');
 
 let users = [
-    {username: 'admin', password: 'admin', image: null, isAdmin: true},
+    {username: 'admin', password: 'admin', image: null, isAdmin: true, token: ''},
 ];
 
 let userHistory = [];
@@ -37,6 +40,8 @@ const server = createServer((req, res) => {
                         break;
                     case '/addEvent':
                         userHistory.push({name: requestData.name, height: requestData.height, day: requestData.day});
+                        const date = extractAndConvertDate(requestData.name);
+                        schedule.scheduleJob(date, sendNotification(''));
                         break;
                     case '/removeEvent':
                         let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
