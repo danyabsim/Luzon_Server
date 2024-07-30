@@ -1,7 +1,7 @@
 import {createServer} from 'http';
 import cors from 'cors';
 import {notFoundResponse, sendResponse, extractDateAndFindUser} from "./Functions/ServerFunctions.js";
-const {sendNotification} = require('./Functions/Norifications.js');
+const {sendNotification} = require('./Functions/Notifications.js');
 const schedule = require('node-schedule');
 
 let users = [
