@@ -86,5 +86,5 @@ const port = 3000;
 const hostname = '0.0.0.0';
 
 server.listen(port, hostname, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://${hostname}:${port}`);
 });
