@@ -29,7 +29,8 @@ const server = createServer((req, res) => {
                         const userIndexConnect = users.findIndex(u => u.username === requestData.username && u.password === requestData.password);
                         if (userIndexConnect !== -1) {
                             users[userIndexConnect].token = requestData.token;
-                            if (users[userIndexConnect].isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userHistory});
+                            const user = users[userIndexConnect]
+                            if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userHistory});
                             else {
                                 const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
                                 sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userSpecificHistory});
@@ -44,10 +45,9 @@ const server = createServer((req, res) => {
                         break;
                     case '/addEvent':
                         userHistory.push({name: requestData.name, height: requestData.height, day: requestData.day});
-                        const { date, eventUser } = extractDateAndFindUser(requestData.name, users);
-                        schedule.scheduleJob(date, () => {
-                            sendNotification(eventUser.token);
-                        });
+                        const { date, eventUsername } = extractDateAndFindUser(requestData.name);
+                        const eventUser = users.find(user => user.username === eventUsername);
+                        schedule.scheduleJob(date, () => sendNotification(eventUser.token));
                         break;
                     case '/removeEvent':
                         let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
@@ -83,6 +83,8 @@ const server = createServer((req, res) => {
 });
 
 const port = 3000;
-server.listen(port, () => {
+const hostname = '0.0.0.0';
+
+server.listen(port, hostname, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
