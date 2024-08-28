@@ -1,11 +1,9 @@
 import {createServer} from 'http';
 import cors from 'cors';
-import {notFoundResponse, sendResponse, extractDateAndFindUser} from "./Functions/ServerFunctions.js";
-import {sendNotification} from './Functions/Notifications.js';
-import schedule from 'node-schedule';
+import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
 
 let users = [
-    {username: 'admin', password: 'admin', image: null, isAdmin: true, token: ''},
+    {username: 'admin', password: 'admin', image: null, isAdmin: true},
 ];
 
 let userHistory = [];
@@ -26,10 +24,8 @@ const server = createServer((req, res) => {
                 const requestData = JSON.parse(body);
                 switch (req.url) {
                     case '/connect':
-                        const userIndexConnect = users.findIndex(u => u.username === requestData.username && u.password === requestData.password);
-                        if (userIndexConnect !== -1) {
-                            users[userIndexConnect].token = requestData.token;
-                            const user = users[userIndexConnect]
+                        const user = users.find(u => u.username === requestData.username && u.password === requestData.password);
+                        if (user) {
                             if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userHistory});
                             else {
                                 const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
@@ -39,15 +35,8 @@ const server = createServer((req, res) => {
                             sendResponse(res, 404, 'User not found');
                         }
                         break;
-                    case '/logout':
-                        const userIndexLogout = users.findIndex(u => u.username === requestData.username);
-                        if (userIndexLogout !== -1 && requestData.isRememberMeOn === false) users[userIndexLogout].token = '';
-                        break;
                     case '/addEvent':
                         userHistory.push({name: requestData.name, height: requestData.height, day: requestData.day});
-                        const { date, eventUsername } = extractDateAndFindUser(requestData.name);
-                        const eventUser = users.find(user => user.username === eventUsername);
-                        schedule.scheduleJob(date, () => sendNotification(eventUser.token));
                         break;
                     case '/removeEvent':
                         let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
