@@ -4,6 +4,7 @@ import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
 
 let users = [
     {username: 'admin', password: 'admin', image: null, isAdmin: true},
+    {username: 'temp', password: 'temp', image: null, isAdmin: false},
 ];
 
 let userHistory = [];
@@ -28,7 +29,7 @@ const server = createServer((req, res) => {
                         if (user) {
                             if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userHistory});
                             else {
-                                const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`));
+                                const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`) || entry.name.includes(`(All Users)`));
                                 sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userSpecificHistory});
                             }
                         } else {
