@@ -3,8 +3,8 @@ import cors from 'cors';
 import {notFoundResponse, sendResponse} from "./Functions/ServerFunctions.js";
 
 let users = [
-    {username: 'admin', password: 'admin', image: null, isAdmin: true},
-    {username: 'temp', password: 'temp', image: null, isAdmin: false},
+    {username: 'admin', password: 'admin', isAdmin: true},
+    {username: 'temp', password: 'temp', isAdmin: false},
 ];
 
 let userHistory = [];
@@ -27,10 +27,10 @@ const server = createServer((req, res) => {
                     case '/connect':
                         const user = users.find(u => u.username === requestData.username && u.password === requestData.password);
                         if (user) {
-                            if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userHistory});
+                            if (user.isAdmin) sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userHistory});
                             else {
                                 const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`) || entry.name.includes(`(All Users)`));
-                                sendResponse(res, 200, {isAdmin: user.isAdmin, image: user.image, userHistory: userSpecificHistory});
+                                sendResponse(res, 200, {isAdmin: user.isAdmin, userHistory: userSpecificHistory});
                             }
                         } else {
                             sendResponse(res, 404, 'User not found');
@@ -50,7 +50,7 @@ const server = createServer((req, res) => {
                         sendResponse(res, 200, users.map(user => user.username));
                         break;
                     case '/addUser':
-                        if (users.findIndex(entry => entry.username === requestData.username) === -1) users.push({username: requestData.username, password: requestData.password, image: null, isAdmin: requestData.isAdmin});
+                        if (users.findIndex(entry => entry.username === requestData.username) === -1) users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
                         break;
                     case '/removeUser':
                         users = users.filter(entry => entry.username !== requestData.username);
@@ -58,10 +58,6 @@ const server = createServer((req, res) => {
                     case '/changePassword':
                         const userIndex = users.findIndex(user => user.username === requestData.username && user.password === requestData.password);
                         if (userIndex !== -1) users[userIndex].password = requestData.newPassword;
-                        break;
-                    case '/changeImage':
-                        const index = users.findIndex(user => user.username === requestData.username && user.password === requestData.password);
-                        if (index !== -1) users[index].image = requestData.image;
                         break;
                     default:
                         notFoundResponse(res);
