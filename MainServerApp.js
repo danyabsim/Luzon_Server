@@ -54,6 +54,7 @@ const server = createServer((req, res) => {
                         break;
                     case '/removeUser':
                         users = users.filter(entry => entry.username !== requestData.username);
+                        userHistory = userHistory.filter(entry => !(entry.name.includes(`(${requestData.username.username})`) || requestData.username.name.includes(`(All Users)`)));
                         break;
                     case '/changePassword':
                         const userIndex = users.findIndex(user => user.username === requestData.username && user.password === requestData.password);
