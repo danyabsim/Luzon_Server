@@ -12,8 +12,6 @@
   "description": "",
   "dependencies": {
     "@hono/node-server": "^1.13.7",
-    "cors": "^2.8.5",
-    "hono": "^4.6.14",
-    "http": "^0.0.1-security"
+    "hono": "^4.6.14"
   }
 }
