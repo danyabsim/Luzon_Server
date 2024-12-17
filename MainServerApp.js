@@ -1,7 +1,5 @@
-import {sendResponse} from "./Functions/ServerFunctions.js";
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { serve } from '@hono/node-server';
+import { fastify } from 'fastify';
+import cors from '@fastify/cors';
 
 let users = [
     {username: 'admin', password: 'admin', isAdmin: true},
@@ -10,34 +8,38 @@ let users = [
 
 let userHistory = [];
 
-const app = new Hono();
+const app = new fastify({logger: true});
 
-app.use('*', cors({
+app.register(cors, {
     origin: '*',
     methods: 'GET, POST, PUT, DELETE'
-}));
+});
 
-app.post('/connect', async (c) => {
-    const requestData = await c.req.json();
+app.post('/connect', async (request, reply) => {
+    const requestData = request.body;
     const user = users.find(u => u.username === requestData.username && u.password === requestData.password);
     if (user) {
-        if (user.isAdmin) return sendResponse(c, 200, {isAdmin: user.isAdmin, userHistory: userHistory});
+        if (user.isAdmin) return {isAdmin: user.isAdmin, userHistory: userHistory};
         else {
             const userSpecificHistory = userHistory.filter(entry => entry.name.includes(`(${user.username})`) || entry.name.includes(`(All Users)`));
-            return sendResponse(c, 200, {isAdmin: user.isAdmin, userHistory: userSpecificHistory});
+            return {isAdmin: user.isAdmin, userHistory: userSpecificHistory};
         }
     } else {
-        return sendResponse(c, 404, 'User not found');
+        reply.code(404).send({
+            error: 'Not Found',
+            message: 'The route you are looking for does not exist',
+            statusCode: 404
+        });
     }
 });
 
-app.post('/addEvent', async (c) => {
-    const requestData = await c.req.json();
+app.post('/addEvent', async (request, reply) => {
+    const requestData = request.body;
     userHistory.push({name: requestData.name, height: requestData.height, day: requestData.day});
 });
 
-app.post('/removeEvent', async (c) => {
-    const requestData = await c.req.json();
+app.post('/removeEvent', async (request, reply) => {
+    const requestData = request.body;
     let indexToRemove = userHistory.findIndex(entry => entry.name === requestData.name && entry.height === requestData.height);
     while (indexToRemove !== -1) {
         userHistory.splice(indexToRemove, 1);
@@ -45,33 +47,44 @@ app.post('/removeEvent', async (c) => {
     }
 });
 
-app.post('/getAllUserNames', (c) => {
-    return sendResponse(c, 200, users.map(user => user.username));
+app.post('/getAllUserNames', (request, reply) => {
+    return users.map(user => user.username);
 });
 
-app.post('/addUser', async (c) => {
-    const requestData = await c.req.json();
+app.post('/addUser', async (request, reply) => {
+    const requestData = request.body;
     if (users.findIndex(entry => entry.username === requestData.username) === -1) {
         users.push({username: requestData.username, password: requestData.password, isAdmin: requestData.isAdmin});
     }
 });
 
-app.post('/removeUser', async (c) => {
-    const requestData = await c.req.json();
+app.post('/removeUser', async (request, reply) => {
+    const requestData = request.body;
     users = users.filter(entry => entry.username !== requestData.username);
     userHistory = userHistory.filter(entry => !(entry.name.includes(`(${requestData.username.username})`) || requestData.username.name.includes(`(All Users)`)));
 });
 
-app.post('/changePassword', async (c) => {
-    const requestData = await c.req.json();
+app.post('/changePassword', async (request, reply) => {
+    const requestData = request.body;
     const userIndex = users.findIndex(user => user.username === requestData.username && user.password === requestData.password);
     if (userIndex !== -1) users[userIndex].password = requestData.newPassword;
 });
 
-app.notFound((c) => {
-    return sendResponse(c, 404, 'Not Found');
+app.setNotFoundHandler((request, reply) => {
+    reply.code(404).send({
+        error: 'Not Found',
+        message: 'The route you are looking for does not exist',
+        statusCode: 404
+    });
 });
 
-serve(app, (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-});
+const start = async () => {
+    try {
+        await app.listen({ port: 3000 });
+        console.log(`Server listening at http://localhost:3000`);
+    } catch (err) {
+        app.log.error(err);
+        process.exit(1);
+    }
+}
+start();
